@@ -534,6 +534,7 @@ public class ShareUtil{
                         "com.instagram.sharedSticker.backgroundTopColor": backgroundTopColor ?? "",
                         "com.instagram.sharedSticker.backgroundBottomColor": backgroundBottomColor ?? "",
                         "com.instagram.sharedSticker.linkText": linkText ?? "",
+                        "com.instagram.sharedSticker.contentURL": attributionURL ?? "",
                         "com.instagram.sharedSticker.linkURL": linkUrl ?? "",
                     ]
                 ]
