@@ -53,7 +53,7 @@ class IOS {
       String? backgroundBottomColor,
       String? attributionURL,
       String? linkText,
-      String? linkUrl}}) {
+      String? linkUrl}) {
     return AppinioSocialSharePlatform.instance.shareToInstagramStory(appId,
         stickerImage: stickerImage,
         backgroundImage: backgroundImage,
