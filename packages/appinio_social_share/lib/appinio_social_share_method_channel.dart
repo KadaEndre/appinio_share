@@ -240,13 +240,17 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   }
 
   @override
-  Future<String> shareToInstagramStory(String appId,
-      {String? stickerImage,
-      String? backgroundImage,
-      String? backgroundVideo,
-      String? backgroundTopColor,
-      String? backgroundBottomColor,
-      String? attributionURL}) async {
+  Future<String> shareToInstagramStory(
+    String appId, {
+    String? stickerImage,
+    String? backgroundImage,
+    String? backgroundVideo,
+    String? backgroundTopColor,
+    String? backgroundBottomColor,
+    String? attributionURL,
+    String? linkText,
+    String? linkUrl,
+  }) async {
     return ((await methodChannel.invokeMethod<String>(instagramStories, {
           "stickerImage": stickerImage,
           "backgroundImage":
@@ -255,7 +259,9 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
           "backgroundTopColor": backgroundTopColor,
           "backgroundBottomColor": backgroundBottomColor,
           "attributionURL": attributionURL,
-          "appId": appId
+          "appId": appId,
+          "linkText": linkText,
+          "linkUrl": linkUrl,
         })) ??
         "");
   }
