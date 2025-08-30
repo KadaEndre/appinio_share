@@ -205,38 +205,55 @@ public class SocialShareUtil {
     }
 
 
-    public String shareToInstagramStory(String appId, String stickerImage, String backgroundImage, String backgroundTopColor, String backgroundBottomColor, String attributionURL, String linkText, String linkUrl, Context activity) {
-
+    public String shareToInstagramStory(String appId,
+                                        String stickerImage,
+                                        String backgroundImage,
+                                        String backgroundTopColor,
+                                        String backgroundBottomColor,
+                                        Context activity) {
         try {
+            Intent shareIntent = new Intent("com.instagram.share.ADD_TO_STORY");
+            shareIntent.setPackage("com.instagram.android");
 
-            Intent shareIntent = new Intent(INSTAGRAM_STORY_PACKAGE);
-            shareIntent.setType("image/*");
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            // Sticker
             if (stickerImage != null) {
                 File file = new File(stickerImage);
-                Uri stickerImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
+                Uri stickerImageUri = FileProvider.getUriForFile(
+                        activity,
+                        activity.getApplicationContext().getPackageName() + ".provider",
+                        file
+                );
                 shareIntent.putExtra("interactive_asset_uri", stickerImageUri);
-                activity.grantUriPermission("com.instagram.android", stickerImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                activity.grantUriPermission("com.instagram.android", stickerImageUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
+
+            // Background
             if (backgroundImage != null) {
                 File file1 = new File(backgroundImage);
-                Uri backgroundImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file1);
-                shareIntent.setDataAndType(backgroundImageUri, getMimeTypeOfFile(backgroundImage));
-                activity.grantUriPermission("com.instagram.android", backgroundImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Uri backgroundImageUri = FileProvider.getUriForFile(
+                        activity,
+                        activity.getApplicationContext().getPackageName() + ".provider",
+                        file1
+                );
+                shareIntent.setDataAndType(backgroundImageUri, "image/*");
+                activity.grantUriPermission("com.instagram.android", backgroundImageUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
-            shareIntent.putExtra("source_application", appId);
-            shareIntent.putExtra("content_url", attributionURL);
+
+            // Colors
             shareIntent.putExtra("top_background_color", backgroundTopColor);
             shareIntent.putExtra("bottom_background_color", backgroundBottomColor);
-            shareIntent.putExtra("link_text", linkText);
-            shareIntent.putExtra("link_url", linkUrl);
+
+            // Start Instagram story editor
             activity.startActivity(shareIntent);
-            return SUCCESS;
+
+            return "SUCCESS";
         } catch (Exception e) {
             return e.getLocalizedMessage();
         }
-
     }
 
 
