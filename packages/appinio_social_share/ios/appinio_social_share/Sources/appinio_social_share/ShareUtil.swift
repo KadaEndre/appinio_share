@@ -556,7 +556,7 @@ public class ShareUtil{
     }
     
     
-    public func shareImageToWhatsApp(args : [String: Any?],result: @escaping FlutterResult, delegate: SharingDelegate) {
+    public func shareImageToWhatsApp(args : [String: Any?],result: @escaping FlutterResult) {
       let imagePath = args[self.argImagePath] as? String
 
       guard let url = URL(string: imagePath!) else {

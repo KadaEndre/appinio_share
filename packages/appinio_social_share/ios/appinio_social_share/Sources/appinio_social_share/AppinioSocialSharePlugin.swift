@@ -7,7 +7,7 @@ import Photos
 
 
 @objc(AppinioSocialSharePlugin)
-public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate {
+public class AppinioSocialSharePlugin: NSObject, FlutterPlugin {
 
     private let INSTAGRAM_DIRECT:String = "instagram_direct";
     private let INSTAGRAM_STORIES:String = "instagram_stories";
@@ -26,10 +26,14 @@ public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate 
 
 
     var shareUtil = ShareUtil()
-    var flutterResult: FlutterResult!
+
+    // Holds the Facebook share delegate alive for the duration of a share.
+    // `ShareDialog.delegate` is `weak`, so without this strong reference the
+    // delegate would be deallocated before the share callback fires.
+    private var shareDelegate: FBShareDelegate?
 
 
-    
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "appinio_social_share", binaryMessenger: registrar.messenger())
     let instance = AppinioSocialSharePlugin()
@@ -38,7 +42,6 @@ public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate 
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       do {
-      flutterResult = result
       let args = call.arguments as? [String: Any?]
 
       switch (call.method) {
@@ -58,7 +61,7 @@ public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate 
           shareUtil.shareToFacebookStory(args:args!,result:result)
           break
       case WHATSAPP_IMG_IOS:
-          shareUtil.shareImageToWhatsApp(args:args!, result:result,delegate: self)
+          shareUtil.shareImageToWhatsApp(args:args!, result:result)
           break
       case WHATSAPP:
           shareUtil.shareToWhatsApp(args:args!, result:result)
@@ -76,7 +79,10 @@ public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate 
           shareUtil.copyToClipboard(args: args!, result: result)
           break
       case FACEBOOK:
-          shareUtil.shareToFacebookPost(args:args!, result: result,delegate: self)
+          let delegate = FBShareDelegate(result: result, successValue: shareUtil.SUCCESS, errorValue: shareUtil.ERROR)
+          delegate.onFinished = { [weak self] in self?.shareDelegate = nil }
+          shareDelegate = delegate
+          shareUtil.shareToFacebookPost(args:args!, result: result, delegate: delegate)
           break
       case TELEGRAM:
           shareUtil.shareToTelegram(args:args!, result:result)
@@ -91,19 +97,42 @@ public class AppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDelegate 
           result(shareUtil.ERROR)
       }
   }
-    
-    public func sharer(_ sharer: Sharing, didCompleteWithResults results: [String : Any]) {
-        flutterResult(shareUtil.SUCCESS)
-     }
-     
-     public func sharer(_ sharer: Sharing, didFailWithError error: Error) {
-         flutterResult(shareUtil.ERROR)
-     }
-     
-     public func sharerDidCancel(_ sharer: Sharing) {
-         flutterResult(shareUtil.ERROR)
-     }
-    
-    
-     
+
+}
+
+/// Receives Facebook `ShareDialog` callbacks and forwards them to a Flutter
+/// result. This is intentionally a separate, non-`@objc`-exposed type so that
+/// the `SharingDelegate` conformance (an `@objc` protocol) does not leak into
+/// `AppinioSocialSharePlugin`'s generated Objective-C interface — keeping that
+/// interface `<FlutterPlugin>` only and avoiding cross-module ODR conflicts in
+/// the generated plugin registrant. It must be strongly retained by the plugin
+/// because `ShareDialog.delegate` is `weak`.
+final class FBShareDelegate: NSObject, SharingDelegate {
+    private let result: FlutterResult
+    private let successValue: String
+    private let errorValue: String
+
+    /// Invoked after any terminal callback so the owner can release this object.
+    var onFinished: (() -> Void)?
+
+    init(result: @escaping FlutterResult, successValue: String, errorValue: String) {
+        self.result = result
+        self.successValue = successValue
+        self.errorValue = errorValue
+    }
+
+    func sharer(_ sharer: Sharing, didCompleteWithResults results: [String : Any]) {
+        result(successValue)
+        onFinished?()
+    }
+
+    func sharer(_ sharer: Sharing, didFailWithError error: Error) {
+        result(errorValue)
+        onFinished?()
+    }
+
+    func sharerDidCancel(_ sharer: Sharing) {
+        result(errorValue)
+        onFinished?()
+    }
 }
