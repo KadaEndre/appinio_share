@@ -27,7 +27,7 @@ android {
         namespace 'com.appinio.socialshare.appinio_social_share'
     }
 
-    compileSdkVersion 31
+    compileSdkVersion 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
