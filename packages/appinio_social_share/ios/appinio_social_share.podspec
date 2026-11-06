@@ -17,11 +17,11 @@ Flutter plugin for sharing content to social media platforms on iOS.
   # CocoaPods and Swift Package Manager. See appinio_social_share/Package.swift.
   s.source_files = 'appinio_social_share/Sources/appinio_social_share/**/*.swift'
   s.dependency 'Flutter'
-  s.dependency 'FBSDKCoreKit', '18.0'
-  s.dependency 'FBSDKShareKit', '18.0'
+  s.dependency 'FBSDKCoreKit', '~> 19.0'
+  s.dependency 'FBSDKShareKit', '~> 19.0'
   s.static_framework = true
 
-  s.platform = :ios, '13.0'
+  s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

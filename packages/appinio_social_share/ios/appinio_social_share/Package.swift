@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "appinio_social_share",
   platforms: [
-    .iOS("13.0")
+    .iOS("15.0")
   ],
   products: [
     .library(name: "appinio-social-share", targets: ["appinio_social_share"])
@@ -14,7 +14,7 @@ let package = Package(
   dependencies: [
     // Flutter is provided by the Flutter toolchain at build time and is not
     // declared here. The Facebook iOS SDK is pulled in via SwiftPM.
-    .package(url: "https://github.com/facebook/facebook-ios-sdk.git", from: "18.0.0")
+    .package(url: "https://github.com/facebook/facebook-ios-sdk.git", from: "19.0.0")
   ],
   targets: [
     .target(
